@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "165789686744",
+    "firebase_url": "https://senzori-56d6b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "senzori-56d6b",
+    "storage_bucket": "senzori-56d6b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165789686744:android:bb037dec59e8b2e8bb70ad",
+        "android_client_info": {
+          "package_name": "com.example.panelview"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5RIAIzFY-evfMkdJ4sUnuhHOMA4OuR7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165789686744:android:a5479e1cb517b980bb70ad",
+        "android_client_info": {
+          "package_name": "com.example.pv_menu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5RIAIzFY-evfMkdJ4sUnuhHOMA4OuR7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".AdaugareSistem">
+
+    <TextView
+        android:id="@+id/IDSistem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="IdSistem"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/editTextIDSistem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/IDSistem" />
+
+    <!-- Prenume -->
+    <TextView
+        android:id="@+id/Locatie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Locatie"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextIDSistem" />
+
+    <EditText
+        android:id="@+id/editTextLocatie"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Locatie" />
+    <EditText
+        android:id="@+id/editTextLatitudine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Latitudinea"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextLocatie"
+        />
+    <EditText
+        android:id="@+id/editTextLongitudine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Longitudinea"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextLatitudine"
+        />
+
+    <Button
+        android:id="@+id/adaugare"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="92dp"
+        android:text="Adaugare"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTextLongitudine" />
+
+</FrameLayout>
