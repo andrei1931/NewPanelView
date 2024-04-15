@@ -1,7 +1,9 @@
 package com.example.pv_menu
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -12,9 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class Login : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var usrEditText: EditText
+    private lateinit var pwdEditText: EditText
+    private lateinit var signInButton: Button
+    private lateinit var signUpButton: Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -25,56 +33,61 @@ class Login : AppCompatActivity() {
             insets
         }
         auth = FirebaseAuth.getInstance()
-        val buton: Button = findViewById(R.id.button)
-        val user_name: EditText = findViewById(R.id.editTextTextPersonName2)
-        val parola: EditText = findViewById(R.id.editTextTextPassword2)
-        val buton2: Button = findViewById(R.id.button2)
+        usrEditText = findViewById(R.id.editTextTextPersonName2)
+        pwdEditText = findViewById(R.id.editTextTextPassword2)
+        signInButton = findViewById(R.id.button)
+        signUpButton = findViewById(R.id.button2)
 
 
-        buton.setOnClickListener {
-            val usr = user_name.text.toString()
-            val pwd = parola.text.toString()
-            aut(usr, pwd)
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
+        val username = sharedPreferences.getString("username", null)
+
+        if (username != null) {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
         }
-        buton2.setOnClickListener {
-            Intent(this, Inregistrare::class.java).also {
-                startActivity(it)
-            }
+        signInButton.setOnClickListener {
+            val usr = usrEditText.text.toString()
+            val pwd = pwdEditText.text.toString()
+
+            signIn(usr, pwd)
         }
-    }
-        fun aut(usr: String, pwd: String) {
-            if (usr.isEmpty() || pwd.isEmpty()) {
-                val myToast =
-                    Toast.makeText(
-                        applicationContext,
-                        "Introdu emailul și parola",
-                        Toast.LENGTH_SHORT
-                    )
-                myToast.show()
-            } else {
-                auth.signInWithEmailAndPassword(usr, pwd)
-                    .addOnCompleteListener(this) { task ->
-                        if (task.isSuccessful) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(ContentValues.TAG, "signInWithEmail:success")
-                            val user = auth.currentUser
-                            Intent(this, MainActivity::class.java).also {
-                                startActivity(it)
 
-                            }
-
-                        } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(ContentValues.TAG, "signInWithEmail:failure", task.exception)
-                            Toast.makeText(
-                                baseContext,
-                                "Email sau parola gresita",
-                                Toast.LENGTH_SHORT,
-                            ).show()
-
-                        }
-                    }
-            }
+        signUpButton.setOnClickListener {
+            startActivity(Intent(this, Inregistrare::class.java))
         }
+
 
     }
+    private fun signIn(usr: String?, pwd: String?) {
+        if (usr.isNullOrEmpty() || pwd.isNullOrEmpty()) {
+            Toast.makeText(this, "Username or password cannot be empty", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        auth.signInWithEmailAndPassword(usr!!.trim(), pwd!!.trim())
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val user = auth.currentUser
+                    updateUI(user)
+                } else {
+                    Log.w("TAG", "signInWithEmail:failure", task.exception)
+                    Toast.makeText(baseContext, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    private fun updateUI(user: FirebaseUser?) {
+        if (user != null) {
+            val editor = getSharedPreferences("MyData", Context.MODE_PRIVATE).edit()
+            editor.putString("username", user.displayName)
+            editor.apply()
+
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+}

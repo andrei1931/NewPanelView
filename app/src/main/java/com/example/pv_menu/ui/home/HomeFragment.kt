@@ -1,15 +1,17 @@
 package com.example.pv_menu.ui.home
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-
+import com.example.pv_menu.Login
+import com.example.pv_menu.R
 import com.example.pv_menu.RecyclerViewAdapter
 import com.example.pv_menu.Sistem
 import com.example.pv_menu.databinding.FragmentHomeBinding
@@ -24,6 +26,7 @@ class HomeFragment : Fragment() {
     private lateinit var recyclerViewAdapter: RecyclerViewAdapter
     private lateinit var db: FirebaseFirestore
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,6 +34,18 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
+        val log_out:Button
+        log_out=binding.buttonL
+        log_out.setOnClickListener(){
+            FirebaseAuth.getInstance().signOut()
+
+            // Start the LoginActivity
+            val intent = Intent(requireContext(), Login::class.java)
+            startActivity(intent)
+
+            // Finish the MainActivity
+            requireActivity().finish()
+        }
 
         db = FirebaseFirestore.getInstance()
         recyclerViewAdapter = RecyclerViewAdapter(emptyList())
