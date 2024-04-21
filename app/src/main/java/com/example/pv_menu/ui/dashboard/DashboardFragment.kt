@@ -1,29 +1,25 @@
 package com.example.pv_menu.ui.dashboard
+
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.WebSettings
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.pv_menu.ApiClient
 import com.example.pv_menu.DashboardRepository
 import com.example.pv_menu.GenerationPower
-import com.example.pv_menu.ViewModelFactory
 import com.example.pv_menu.databinding.FragmentDashboardBinding
-import com.example.pv_menu.ui.dashboard.DashboardViewModel
-import com.google.gson.Gson
+import com.example.pv_menu.ViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class DashboardFragment : Fragment() {
 
-    private lateinit var viewModel: DashboardViewModel
     private lateinit var binding: FragmentDashboardBinding
+    private lateinit var viewModel: DashboardViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,46 +32,73 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val apiService = ApiClient.apiService
-        val repository = DashboardRepository(apiService)
+        // Inițializare ViewModel
+        val repository = DashboardRepository(ApiClient.apiService)
         val viewModelFactory = ViewModelFactory(repository)
         viewModel = ViewModelProvider(this, viewModelFactory).get(DashboardViewModel::class.java)
 
+        // Inițializare WebView
+        val webView = binding.webviewChart
+        val webSettings: WebSettings = webView.settings
+        webSettings.javaScriptEnabled = true // Activează suportul pentru JavaScript
+
+        // Specificarea intervalului de timp pentru cererea de date
         val start = "2024-04-02T10:58:00"
         val end = "2024-04-03T13:30:00"
-        Log.d("DashboardFragment", "Fetching power data from $start to $end")
 
-        // Log pentru a verifica încărcarea fișierului HTML în WebView
-        loadWebView()
-
+        // Pornirea cererii de date într-un fir de execuție separat
         GlobalScope.launch(Dispatchers.IO) {
+            // Obținerea datelor pentru grafic din ViewModel
             viewModel.fetchPowerData(start, end)
         }
 
-        viewModel.powerData.observe(viewLifecycleOwner, Observer { data ->
-            Log.d("DashboardFragment", "Power data fetched: $data")
-            updateChart(data)
+        // Observarea datelor de putere primite și construirea și afișarea graficului în WebView
+        viewModel.powerData.observe(viewLifecycleOwner, { data ->
+            val htmlContent = buildChartHtml(data)
+            webView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
         })
     }
 
-    private fun loadWebView() {
-        val webView = binding.webviewChart
-        webView.settings.javaScriptEnabled = true
-        val urlToLoad = "file:///android_asset/chart.html"
-        Log.d("DashboardFragment", "Loading URL: $urlToLoad")
-        webView.loadUrl(urlToLoad)
-    }
-
-    private fun updateChart(data: List<GenerationPower>?) {
-        data?.let {
-            val jsonData: String = Gson().toJson(data)
-            val webView: WebView = binding.webviewChart
-            webView.settings.javaScriptEnabled = true
-
-            webView.evaluateJavascript("updateChart('$jsonData');") { result ->
-                Log.d("Dashboard Fragment", "Updated chart result: $result")
-            }
-        }
-
+    private fun buildChartHtml(data: List<GenerationPower>): String {
+        // Construiește conținutul HTML pentru afișarea graficului
+        val labels = (0 until data.size).map { "Entry $it" }
+        val values = data.map { it.generationMW }
+        val labelsJson = labels.joinToString(prefix = "[\"", postfix = "\"]", separator = "\",\"")
+        val valuesJson = values.joinToString(prefix = "[", postfix = "]", separator = ",")
+        return """
+            <html>
+            <head>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            </head>
+            <body>
+                <canvas id="myChart" width="400" height="400"></canvas>
+                <script>
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: $labelsJson,
+                            datasets: [{
+                                label: 'Power Data',
+                                data: $valuesJson,
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgba(255, 99, 132, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                </script>
+            </body>
+            </html>
+        """.trimIndent()
     }
 }
