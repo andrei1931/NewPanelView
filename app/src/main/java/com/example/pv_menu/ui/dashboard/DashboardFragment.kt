@@ -1,5 +1,6 @@
 package com.example.pv_menu.ui.dashboard
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,8 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.pv_menu.ApiClient
 import com.example.pv_menu.DashboardRepository
 import com.example.pv_menu.GenerationPower
-import com.example.pv_menu.databinding.FragmentDashboardBinding
+import com.example.pv_menu.SharedPrefsUtil
 import com.example.pv_menu.ViewModelFactory
+import com.example.pv_menu.databinding.FragmentDashboardBinding
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -20,12 +24,14 @@ class DashboardFragment : Fragment() {
 
     private lateinit var binding: FragmentDashboardBinding
     private lateinit var viewModel: DashboardViewModel
+    private lateinit var sharedPrefsUtil: SharedPrefsUtil // Clasa utilitară pentru gestionarea SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentDashboardBinding.inflate(inflater, container, false)
+        sharedPrefsUtil = SharedPrefsUtil(requireContext()) // Inițializare clasa utilitară pentru SharedPreferences
         return binding.root
     }
 
@@ -42,20 +48,32 @@ class DashboardFragment : Fragment() {
         val webSettings: WebSettings = webView.settings
         webSettings.javaScriptEnabled = true // Activează suportul pentru JavaScript
 
-        // Specificarea intervalului de timp pentru cererea de date
-        val start = "2024-04-02T10:58:00"
-        val end = "2024-04-03T13:30:00"
+        // Încercare de încărcare a datelor din SharedPreferences
+        val cachedData = sharedPrefsUtil.getData("power_data")
+        if (cachedData != null) {
+            val powerData = Gson().fromJson<List<GenerationPower>>(
+                cachedData,
+                object : TypeToken<List<GenerationPower>>() {}.type
+            )
 
-        // Pornirea cererii de date într-un fir de execuție separat
-        GlobalScope.launch(Dispatchers.IO) {
-            // Obținerea datelor pentru grafic din ViewModel
-            viewModel.fetchPowerData(start, end)
+            viewModel.setCachedPowerData(powerData)
+        } else {
+            // Dacă nu există date salvate în cache, facem cererea către server
+            val start = "2024-04-29T12:58:00"
+            val end = "2024-04-30T13:30:00"
+            GlobalScope.launch(Dispatchers.IO) {
+                viewModel.fetchPowerData(start, end)
+            }
         }
 
         // Observarea datelor de putere primite și construirea și afișarea graficului în WebView
         viewModel.powerData.observe(viewLifecycleOwner, { data ->
             val htmlContent = buildChartHtml(data)
             webView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
+
+            // Salvare date în SharedPreferences
+            val jsonPowerData = Gson().toJson(data)
+            sharedPrefsUtil.saveData("power_data", jsonPowerData)
         })
     }
 

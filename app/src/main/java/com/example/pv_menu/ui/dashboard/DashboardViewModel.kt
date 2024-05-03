@@ -21,5 +21,9 @@ class DashboardViewModel(private val repository: DashboardRepository) : ViewMode
             val data = repository.fetchData(start, end)
             _powerData.postValue(data)
         }
+
+    }
+    fun setCachedPowerData(data: List<GenerationPower>) {
+        _powerData.postValue(data)
     }
 }
