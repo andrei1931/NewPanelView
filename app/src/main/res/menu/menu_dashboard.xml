@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- dashboard_menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_item1"
+        android:title="Properties" />
+    <item
+        android:id="@+id/menu_item2"
+        android:title="Other" />
+</menu>
