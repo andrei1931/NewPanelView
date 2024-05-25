@@ -6,5 +6,5 @@
         android:title="Properties" />
     <item
         android:id="@+id/menu_item2"
-        android:title="Other" />
+        android:title="Events" />
 </menu>

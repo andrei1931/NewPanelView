@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.pv_menu.ApiClient
 import com.example.pv_menu.DashboardRepository
+import com.example.pv_menu.Events
 import com.example.pv_menu.GenerationPower
 import com.example.pv_menu.Inregistrare
 import com.example.pv_menu.MainActivity
@@ -108,6 +109,10 @@ class DashboardFragment : Fragment() {
             }
             R.id.menu_item2 -> {
                 // Gestionează acțiunea pentru al doilea element de meniu
+                val intent = Intent(requireContext(), Events::class.java)
+                val idJs = sharedPreferences.getString("idJs", null)
+                intent.putExtra("idJs", idJs)
+                startActivity(intent)
                 true
             }
             else -> super.onOptionsItemSelected(item)
