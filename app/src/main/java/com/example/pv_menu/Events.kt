@@ -1,42 +1,89 @@
 package com.example.pv_menu
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Events : AppCompatActivity() {
 
     private lateinit var listView: ListView
     private lateinit var eventsAdapter: ArrayAdapter<String>
+    private val db = FirebaseFirestore.getInstance()
+    private var idJs: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_events)
 
+        // Obține idJs din intent
+        idJs = intent.getStringExtra("idJs")
+
+        // Inițializează ListView și adapter-ul
         listView = findViewById(R.id.listViewEvenimente)
-
-        // JSON fals pentru evenimente
-        val jsonFakeEvents = """
-            [
-                {"title": "Eveniment 1", "date": "2024-05-20"},
-                {"title": "Eveniment 2", "date": "2024-06-15"},
-                {"title": "Eveniment 3", "date": "2024-07-10"}
-            ]
-        """
-
-        // Parsează JSON-ul
-        val events: List<Event> = Gson().fromJson(jsonFakeEvents, object : TypeToken<List<Event>>() {}.type)
-        val eventsDisplayList = events.map { "${it.title} - ${it.date}" }
-
-        // Creează un ArrayAdapter
-        eventsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, eventsDisplayList)
-
-        // Setează adapter-ul pe ListView
+        eventsAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, mutableListOf())
         listView.adapter = eventsAdapter
+
+        // Citește evenimentele din Firebase dacă idJs nu este nul
+        if (idJs != null) {
+            Log.d("Events", "idJs: $idJs")  // Log pentru debugging
+            getEventsFromFirebase(idJs!!)
+        } else {
+            // Tratează cazul în care idJs este nul (de exemplu, afișează un mesaj de eroare)
+            showError("ID-ul sistemului fotovoltaic nu este specificat.")
+        }
     }
 
-    data class Event(val title: String, val date: String)
+    private fun getEventsFromFirebase(idJs: String) {
+        val userCurent = FirebaseAuth.getInstance().currentUser
+        if (userCurent != null) {
+            val userId = userCurent.uid
+            val eventsRef = db.collection("profiles").document(userId).collection("sis")
+                .document(idJs).collection("evenimente")
+
+            Log.d("Events", "Reference: ${eventsRef.path}")
+
+            eventsRef.get()
+                .addOnSuccessListener { documents ->
+                    val eventsList = mutableListOf<String>()
+                    for (document in documents) {
+                        Log.d("Events", "Document ID: ${document.id}")
+                        val eventDetails = StringBuilder()
+                        for (field in document.data) {
+                            val value = field.value
+                            val formattedValue = when (value) {
+                                is Timestamp -> SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault()).format(value.toDate())
+                                else -> value.toString()
+                            }
+                            eventDetails.append("${field.key}: $formattedValue\n")
+                        }
+                        eventsList.add(eventDetails.toString().trim())
+                    }
+                    // Actualizează adapter-ul cu lista de evenimente
+                    eventsAdapter.clear()
+                    eventsAdapter.addAll(eventsList)
+                    eventsAdapter.notifyDataSetChanged()
+                }
+                .addOnFailureListener { exception ->
+                    // Tratează eroarea
+                    Log.e("Events", "Error getting documents: ", exception)
+                    showError("Eroare la încărcarea evenimentelor: ${exception.message}")
+                }
+        } else {
+            showError("Utilizatorul nu este autentificat.")
+        }
+    }
+
+    private fun showError(message: String) {
+        // Afișează un mesaj de eroare (de exemplu, folosind Toast)
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
 }
