@@ -40,6 +40,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        dataBinding =true
     }
 }
 
@@ -57,6 +58,10 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation ("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
+    implementation("com.google.firebase:firebase-messaging:24.0.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,6 +73,8 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
     implementation ("androidx.webkit:webkit:1.4.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
 
 
