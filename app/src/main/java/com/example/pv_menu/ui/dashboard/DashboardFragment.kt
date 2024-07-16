@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -16,18 +15,15 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.example.pv_menu.*
 import com.example.pv_menu.databinding.FragmentDashboardBinding
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
 import java.util.Locale
 import kotlin.random.Random
@@ -37,6 +33,7 @@ class DashboardFragment : Fragment() {
     private lateinit var binding: FragmentDashboardBinding
     private lateinit var viewModel: DashboardViewModel
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var navController: NavController
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +47,8 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
+
+        navController = findNavController()
 
         val idJs = sharedPreferences.getString("idJs", null)
         val repository = DashboardRepository(ApiClient.apiService)
@@ -68,19 +67,15 @@ class DashboardFragment : Fragment() {
                 else ->  Random.nextInt(13, 24).toString()
             }
 
-            if (systemId != null) {
-                val start = "2024-05-29T5:00"
-                val end = "2024-05-29T21:30"
+            val start = "2024-05-29T5:00"
+            val end = "2024-05-29T21:30"
 
-                GlobalScope.launch(Dispatchers.IO) {
-                    try {
-                        viewModel.fetchPowerDataForSystem(systemId, start, end)
-                    } catch (e: Exception) {
-                        Log.e("DashboardFragment", "Failed to fetch power data", e)
-                    }
+            GlobalScope.launch(Dispatchers.IO) {
+                try {
+                    viewModel.fetchPowerDataForSystem(systemId, start, end)
+                } catch (e: Exception) {
+                    Log.e("DashboardFragment", "Failed to fetch power data", e)
                 }
-            } else {
-                Log.e("DashboardFragment", "Unknown idJs value: $idJs")
             }
         } else {
             Log.e("DashboardFragment", "idJs is null")
@@ -106,12 +101,15 @@ class DashboardFragment : Fragment() {
                 navigateToProprietatiSistem()
                 true
             }
-
             R.id.menu_item2 -> {
                 navigateToEvents()
                 true
             }
-
+            android.R.id.home -> {
+                navController.navigate(R.id.navigation_home)
+                Log.d("DashboardFragment", "Navigated back to Home from Dashboard")
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -136,11 +134,9 @@ class DashboardFragment : Fragment() {
                 val timestamp = power.timestamp
                 if (timestamp != null && timestamp.isNotEmpty()) {
                     try {
-                        // Parsează timestamp-ul folosind SimpleDateFormat cu formatul corect
                         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
                         val date = sdf.parse(timestamp)
 
-                        // Extrage ora și minutul din timestamp
                         val calendar = Calendar.getInstance()
                         calendar.time = date
                         val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -201,6 +197,4 @@ class DashboardFragment : Fragment() {
         </html>
     """.trimIndent()
     }
-
-
 }

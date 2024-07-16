@@ -1,0 +1,6 @@
+projectKey=PanelView
+serverUrl=http://localhost:9000
+serverVersion=10.6.0.92116
+dashboardUrl=http://localhost:9000/dashboard?id=PanelView
+ceTaskId=34c38dc9-db6d-46bc-9162-e4c884c6a198
+ceTaskUrl=http://localhost:9000/api/ce/task?id=34c38dc9-db6d-46bc-9162-e4c884c6a198

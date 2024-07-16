@@ -1,9 +1,10 @@
-import java.net.URI
+
 
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     id("com.google.gms.google-services")
+    id("org.sonarqube") version "5.0.0.4638"
 }
 
 
@@ -58,14 +59,16 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation ("org.osmdroid:osmdroid-android:6.1.18")
+    implementation ("org.osmdroid:osmdroid-wms:6.1.18")
     implementation("com.google.firebase:firebase-auth-ktx:23.0.0")
     implementation("com.google.firebase:firebase-firestore-ktx:25.0.0")
     implementation("com.google.firebase:firebase-messaging:24.0.0")
     testImplementation ("org.mockito:mockito-core:3.12.4")
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("androidx.biometric:biometric:1.1.0")
+
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation ("androidx.lifecycle:lifecycle-livedata-ktx:2.3.1")
@@ -78,4 +81,11 @@ dependencies {
 
 
 
+
+}
+sonar {
+    properties {
+        property("sonar.projectKey", "PanelView")
+        property("sonar.host.url", "http://localhost:9000")
+    }
 }

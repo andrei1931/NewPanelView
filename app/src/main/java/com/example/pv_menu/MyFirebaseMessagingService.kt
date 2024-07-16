@@ -25,10 +25,13 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Log.d("FCMToken", "onNewToken called")
         saveTokenToSharedPreferences(token)
-       // sendTokenToServer(token)
-        Log.d("FCMToken", "Refreshed token: $token")
+        Log.d("FCMToken", "Token saved to SharedPreferences: $token")
+        sendTokenToServer(token)
+        Log.d("FCMToken", "Token sent to server: $token")
     }
+
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
@@ -100,18 +103,26 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
     private fun sendTokenToServer(token: String) {
         val client = OkHttpClient()
-        val url = "http://192.168.1.181/api/tokens"
+        val url = "http://10.111.11.21:8080/api/tokens"
         val json = """{"token":"$token"}"""
         val body = json.toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
         val request = Request.Builder()
             .url(url)
             .post(body)
             .build()
+        Log.d("MyFirebaseMessaging", "Sending token to server: $token")
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) {
-                throw IOException("Unexpected code $response")
+        try {
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) {
+                    Log.e("MyFirebaseMessaging", "Unexpected response code: ${response.code}")
+                    throw IOException("Unexpected code $response")
+                } else {
+                    Log.d("MyFirebaseMessaging", "Token successfully sent to server")
+                }
             }
+        } catch (e: IOException) {
+            Log.e("MyFirebaseMessaging", "Error sending token to server", e)
         }
     }
 }

@@ -11,7 +11,8 @@ import com.example.pv_menu.NotificationAdapter
 import com.example.pv_menu.databinding.FragmentNotificationsBinding
 
 
-class NotificationsFragment : Fragment() {
+class NotificationsFragment : Fragment
+    () {
 
     private var _binding: FragmentNotificationsBinding? = null
     private val binding get() = _binding!!

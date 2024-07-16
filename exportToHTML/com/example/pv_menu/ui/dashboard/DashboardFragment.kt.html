@@ -1,0 +1,221 @@
+<html>
+<head>
+<title>DashboardFragment.kt</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cf8e6d;}
+.s1 { color: #bcbec4;}
+.s2 { color: #bcbec4;}
+.s3 { color: #6aab73;}
+.s4 { color: #2aacb8;}
+</style>
+</head>
+<body bgcolor="#1e1f22">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+DashboardFragment.kt</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">pv_menu</span><span class="s2">.</span><span class="s1">ui</span><span class="s2">.</span><span class="s1">dashboard</span>
+
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">content</span><span class="s2">.</span><span class="s1">Context</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">content</span><span class="s2">.</span><span class="s1">Intent</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">content</span><span class="s2">.</span><span class="s1">SharedPreferences</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">os</span><span class="s2">.</span><span class="s1">Bundle</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Log</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">LayoutInflater</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">Menu</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">MenuInflater</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">MenuItem</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">View</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">view</span><span class="s2">.</span><span class="s1">ViewGroup</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">webkit</span><span class="s2">.</span><span class="s1">WebSettings</span>
+<span class="s1">import android</span><span class="s2">.</span><span class="s1">webkit</span><span class="s2">.</span><span class="s1">WebView</span>
+<span class="s1">import androidx</span><span class="s2">.</span><span class="s1">fragment</span><span class="s2">.</span><span class="s1">app</span><span class="s2">.</span><span class="s1">Fragment</span>
+<span class="s1">import androidx</span><span class="s2">.</span><span class="s1">lifecycle</span><span class="s2">.</span><span class="s1">ViewModelProvider</span>
+<span class="s1">import androidx</span><span class="s2">.</span><span class="s1">navigation</span><span class="s2">.</span><span class="s1">NavController</span>
+<span class="s1">import androidx</span><span class="s2">.</span><span class="s1">navigation</span><span class="s2">.</span><span class="s1">fragment</span><span class="s2">.</span><span class="s1">findNavController</span>
+<span class="s1">import com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">pv_menu</span><span class="s2">.*</span>
+<span class="s1">import com</span><span class="s2">.</span><span class="s1">example</span><span class="s2">.</span><span class="s1">pv_menu</span><span class="s2">.</span><span class="s1">databinding</span><span class="s2">.</span><span class="s1">FragmentDashboardBinding</span>
+<span class="s1">import kotlinx</span><span class="s2">.</span><span class="s1">coroutines</span><span class="s2">.</span><span class="s1">Dispatchers</span>
+<span class="s1">import kotlinx</span><span class="s2">.</span><span class="s1">coroutines</span><span class="s2">.</span><span class="s1">GlobalScope</span>
+<span class="s1">import kotlinx</span><span class="s2">.</span><span class="s1">coroutines</span><span class="s2">.</span><span class="s1">launch</span>
+<span class="s1">import java</span><span class="s2">.</span><span class="s1">text</span><span class="s2">.</span><span class="s1">ParseException</span>
+<span class="s1">import java</span><span class="s2">.</span><span class="s1">text</span><span class="s2">.</span><span class="s1">SimpleDateFormat</span>
+<span class="s1">import java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Calendar</span>
+<span class="s1">import java</span><span class="s2">.</span><span class="s1">util</span><span class="s2">.</span><span class="s1">Locale</span>
+<span class="s1">import kotlin</span><span class="s2">.</span><span class="s1">random</span><span class="s2">.</span><span class="s1">Random</span>
+
+<span class="s0">class </span><span class="s1">DashboardFragment : Fragment</span><span class="s2">() {</span>
+
+    <span class="s1">private lateinit </span><span class="s0">var </span><span class="s1">binding: FragmentDashboardBinding</span>
+    <span class="s1">private lateinit </span><span class="s0">var </span><span class="s1">viewModel: DashboardViewModel</span>
+    <span class="s1">private lateinit </span><span class="s0">var </span><span class="s1">sharedPreferences: SharedPreferences</span>
+    <span class="s1">private lateinit </span><span class="s0">var </span><span class="s1">navController: NavController</span>
+
+    <span class="s1">override </span><span class="s0">fun </span><span class="s1">onCreateView</span><span class="s2">(</span>
+        <span class="s1">inflater: LayoutInflater</span><span class="s2">, </span><span class="s1">container: ViewGroup?</span><span class="s2">,</span>
+        <span class="s1">savedInstanceState: Bundle?</span>
+    <span class="s2">)</span><span class="s1">: View </span><span class="s2">{</span>
+        <span class="s1">binding </span><span class="s2">= </span><span class="s1">FragmentDashboardBinding</span><span class="s2">.</span><span class="s1">inflate</span><span class="s2">(</span><span class="s1">inflater</span><span class="s2">, </span><span class="s1">container</span><span class="s2">, </span><span class="s0">false</span><span class="s2">)</span>
+        <span class="s1">sharedPreferences </span><span class="s2">= </span><span class="s1">requireContext</span><span class="s2">().</span><span class="s1">getSharedPreferences</span><span class="s2">(</span><span class="s3">&quot;app_prefs&quot;</span><span class="s2">, </span><span class="s1">Context</span><span class="s2">.</span><span class="s1">MODE_PRIVATE</span><span class="s2">)</span>
+        <span class="s0">return </span><span class="s1">binding</span><span class="s2">.</span><span class="s1">root</span>
+    <span class="s2">}</span>
+
+    <span class="s1">override </span><span class="s0">fun </span><span class="s1">onViewCreated</span><span class="s2">(</span><span class="s1">view: View</span><span class="s2">, </span><span class="s1">savedInstanceState: Bundle?</span><span class="s2">) {</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">onViewCreated</span><span class="s2">(</span><span class="s1">view</span><span class="s2">, </span><span class="s1">savedInstanceState</span><span class="s2">)</span>
+        <span class="s1">setHasOptionsMenu</span><span class="s2">(</span><span class="s0">true</span><span class="s2">)</span>
+
+        <span class="s1">navController </span><span class="s2">= </span><span class="s1">findNavController</span><span class="s2">()</span>
+
+        <span class="s0">val </span><span class="s1">idJs </span><span class="s2">= </span><span class="s1">sharedPreferences</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;idJs&quot;</span><span class="s2">, </span><span class="s0">null</span><span class="s2">)</span>
+        <span class="s0">val </span><span class="s1">repository </span><span class="s2">= </span><span class="s1">DashboardRepository</span><span class="s2">(</span><span class="s1">ApiClient</span><span class="s2">.</span><span class="s1">apiService</span><span class="s2">)</span>
+        <span class="s0">val </span><span class="s1">viewModelFactory </span><span class="s2">= </span><span class="s1">ViewModelFactory</span><span class="s2">(</span><span class="s1">repository</span><span class="s2">)</span>
+        <span class="s1">viewModel </span><span class="s2">= </span><span class="s1">ViewModelProvider</span><span class="s2">(</span><span class="s0">this</span><span class="s2">, </span><span class="s1">viewModelFactory</span><span class="s2">).</span><span class="s1">get</span><span class="s2">(</span><span class="s1">DashboardViewModel::</span><span class="s0">class</span><span class="s2">.</span><span class="s1">java</span><span class="s2">)</span>
+
+        <span class="s0">val </span><span class="s1">webView </span><span class="s2">= </span><span class="s1">binding</span><span class="s2">.</span><span class="s1">webviewChart</span>
+        <span class="s0">val </span><span class="s1">webSettings: WebSettings </span><span class="s2">= </span><span class="s1">webView</span><span class="s2">.</span><span class="s1">settings</span>
+        <span class="s1">webSettings</span><span class="s2">.</span><span class="s1">javaScriptEnabled </span><span class="s2">= </span><span class="s0">true</span>
+
+        <span class="s0">if </span><span class="s2">(</span><span class="s1">idJs </span><span class="s2">!= </span><span class="s0">null</span><span class="s2">) {</span>
+            <span class="s0">val </span><span class="s1">systemId </span><span class="s2">= </span><span class="s0">when </span><span class="s2">(</span><span class="s1">idJs</span><span class="s2">) {</span>
+                <span class="s3">&quot;huawei&quot; </span><span class="s2">-&gt; </span><span class="s3">&quot;10&quot;</span>
+                <span class="s3">&quot;id04&quot; </span><span class="s2">-&gt; </span><span class="s3">&quot;11&quot;</span>
+                <span class="s3">&quot;solaris&quot; </span><span class="s2">-&gt; </span><span class="s3">&quot;12&quot;</span>
+                <span class="s0">else </span><span class="s2">-&gt;  </span><span class="s1">Random</span><span class="s2">.</span><span class="s1">nextInt</span><span class="s2">(</span><span class="s4">13</span><span class="s2">, </span><span class="s4">24</span><span class="s2">).</span><span class="s1">toString</span><span class="s2">()</span>
+            <span class="s2">}</span>
+
+            <span class="s0">val </span><span class="s1">start </span><span class="s2">= </span><span class="s3">&quot;2024-05-29T5:00&quot;</span>
+            <span class="s0">val </span><span class="s1">end </span><span class="s2">= </span><span class="s3">&quot;2024-05-29T21:30&quot;</span>
+
+            <span class="s1">GlobalScope</span><span class="s2">.</span><span class="s1">launch</span><span class="s2">(</span><span class="s1">Dispatchers</span><span class="s2">.</span><span class="s1">IO</span><span class="s2">) {</span>
+                <span class="s0">try </span><span class="s2">{</span>
+                    <span class="s1">viewModel</span><span class="s2">.</span><span class="s1">fetchPowerDataForSystem</span><span class="s2">(</span><span class="s1">systemId</span><span class="s2">, </span><span class="s1">start</span><span class="s2">, </span><span class="s1">end</span><span class="s2">)</span>
+                <span class="s2">} </span><span class="s1">catch </span><span class="s2">(</span><span class="s1">e: Exception</span><span class="s2">) {</span>
+                    <span class="s1">Log</span><span class="s2">.</span><span class="s1">e</span><span class="s2">(</span><span class="s3">&quot;DashboardFragment&quot;</span><span class="s2">, </span><span class="s3">&quot;Failed to fetch power data&quot;</span><span class="s2">, </span><span class="s1">e</span><span class="s2">)</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+        <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+            <span class="s1">Log</span><span class="s2">.</span><span class="s1">e</span><span class="s2">(</span><span class="s3">&quot;DashboardFragment&quot;</span><span class="s2">, </span><span class="s3">&quot;idJs is null&quot;</span><span class="s2">)</span>
+        <span class="s2">}</span>
+
+        <span class="s1">viewModel</span><span class="s2">.</span><span class="s1">powerData</span><span class="s2">.</span><span class="s1">observe</span><span class="s2">(</span><span class="s1">viewLifecycleOwner</span><span class="s2">, { </span><span class="s1">data </span><span class="s2">-&gt;</span>
+            <span class="s1">data</span><span class="s2">.</span><span class="s1">forEach </span><span class="s2">{ (</span><span class="s1">systemId</span><span class="s2">, </span><span class="s1">generationPowers</span><span class="s2">) -&gt;</span>
+                <span class="s1">Log</span><span class="s2">.</span><span class="s1">d</span><span class="s2">(</span><span class="s3">&quot;DashboardFragment&quot;</span><span class="s2">, </span><span class="s3">&quot;System </span><span class="s0">$</span><span class="s1">systemId </span><span class="s3">data received: </span><span class="s0">$</span><span class="s1">generationPowers</span><span class="s3">&quot;</span><span class="s2">)</span>
+            <span class="s2">}</span>
+            <span class="s0">val </span><span class="s1">htmlContent </span><span class="s2">= </span><span class="s1">buildChartHtml</span><span class="s2">(</span><span class="s1">data</span><span class="s2">)</span>
+            <span class="s1">webView</span><span class="s2">.</span><span class="s1">loadDataWithBaseURL</span><span class="s2">(</span><span class="s0">null</span><span class="s2">, </span><span class="s1">htmlContent</span><span class="s2">, </span><span class="s3">&quot;text/html&quot;</span><span class="s2">, </span><span class="s3">&quot;UTF-8&quot;</span><span class="s2">, </span><span class="s0">null</span><span class="s2">)</span>
+        <span class="s2">})</span>
+    <span class="s2">}</span>
+
+    <span class="s1">override </span><span class="s0">fun </span><span class="s1">onCreateOptionsMenu</span><span class="s2">(</span><span class="s1">menu: Menu</span><span class="s2">, </span><span class="s1">inflater: MenuInflater</span><span class="s2">) {</span>
+        <span class="s1">inflater</span><span class="s2">.</span><span class="s1">inflate</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">menu</span><span class="s2">.</span><span class="s1">menu_dashboard</span><span class="s2">, </span><span class="s1">menu</span><span class="s2">)</span>
+        <span class="s0">super</span><span class="s2">.</span><span class="s1">onCreateOptionsMenu</span><span class="s2">(</span><span class="s1">menu</span><span class="s2">, </span><span class="s1">inflater</span><span class="s2">)</span>
+    <span class="s2">}</span>
+
+    <span class="s1">override </span><span class="s0">fun </span><span class="s1">onOptionsItemSelected</span><span class="s2">(</span><span class="s1">item: MenuItem</span><span class="s2">)</span><span class="s1">: Boolean </span><span class="s2">{</span>
+        <span class="s0">return when </span><span class="s2">(</span><span class="s1">item</span><span class="s2">.</span><span class="s1">itemId</span><span class="s2">) {</span>
+            <span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">menu_item1 </span><span class="s2">-&gt; {</span>
+                <span class="s1">navigateToProprietatiSistem</span><span class="s2">()</span>
+                <span class="s0">true</span>
+            <span class="s2">}</span>
+            <span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">menu_item2 </span><span class="s2">-&gt; {</span>
+                <span class="s1">navigateToEvents</span><span class="s2">()</span>
+                <span class="s0">true</span>
+            <span class="s2">}</span>
+            <span class="s1">android</span><span class="s2">.</span><span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">home </span><span class="s2">-&gt; {</span>
+                <span class="s1">navController</span><span class="s2">.</span><span class="s1">navigate</span><span class="s2">(</span><span class="s1">R</span><span class="s2">.</span><span class="s1">id</span><span class="s2">.</span><span class="s1">navigation_home</span><span class="s2">)</span>
+                <span class="s1">Log</span><span class="s2">.</span><span class="s1">d</span><span class="s2">(</span><span class="s3">&quot;DashboardFragment&quot;</span><span class="s2">, </span><span class="s3">&quot;Navigated back to Home from Dashboard&quot;</span><span class="s2">)</span>
+                <span class="s0">true</span>
+            <span class="s2">}</span>
+            <span class="s0">else </span><span class="s2">-&gt; </span><span class="s0">super</span><span class="s2">.</span><span class="s1">onOptionsItemSelected</span><span class="s2">(</span><span class="s1">item</span><span class="s2">)</span>
+        <span class="s2">}</span>
+    <span class="s2">}</span>
+
+    <span class="s1">private </span><span class="s0">fun </span><span class="s1">navigateToProprietatiSistem</span><span class="s2">() {</span>
+        <span class="s0">val </span><span class="s1">intent </span><span class="s2">= </span><span class="s1">Intent</span><span class="s2">(</span><span class="s1">requireContext</span><span class="s2">(), </span><span class="s1">ProprietatiSistem::</span><span class="s0">class</span><span class="s2">.</span><span class="s1">java</span><span class="s2">)</span>
+        <span class="s0">val </span><span class="s1">idJs </span><span class="s2">= </span><span class="s1">sharedPreferences</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;idJs&quot;</span><span class="s2">, </span><span class="s0">null</span><span class="s2">)</span>
+        <span class="s1">intent</span><span class="s2">.</span><span class="s1">putExtra</span><span class="s2">(</span><span class="s3">&quot;idJs&quot;</span><span class="s2">, </span><span class="s1">idJs</span><span class="s2">)</span>
+        <span class="s1">startActivity</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+    <span class="s2">}</span>
+
+    <span class="s1">private </span><span class="s0">fun </span><span class="s1">navigateToEvents</span><span class="s2">() {</span>
+        <span class="s0">val </span><span class="s1">intent </span><span class="s2">= </span><span class="s1">Intent</span><span class="s2">(</span><span class="s1">requireContext</span><span class="s2">(), </span><span class="s1">Events::</span><span class="s0">class</span><span class="s2">.</span><span class="s1">java</span><span class="s2">)</span>
+        <span class="s0">val </span><span class="s1">idJs </span><span class="s2">= </span><span class="s1">sharedPreferences</span><span class="s2">.</span><span class="s1">getString</span><span class="s2">(</span><span class="s3">&quot;idJs&quot;</span><span class="s2">, </span><span class="s0">null</span><span class="s2">)</span>
+        <span class="s1">intent</span><span class="s2">.</span><span class="s1">putExtra</span><span class="s2">(</span><span class="s3">&quot;idJs&quot;</span><span class="s2">, </span><span class="s1">idJs</span><span class="s2">)</span>
+        <span class="s1">startActivity</span><span class="s2">(</span><span class="s1">intent</span><span class="s2">)</span>
+    <span class="s2">}</span>
+
+    <span class="s1">private </span><span class="s0">fun </span><span class="s1">buildChartHtml</span><span class="s2">(</span><span class="s1">data: Map</span><span class="s2">&lt;</span><span class="s1">String</span><span class="s2">, </span><span class="s1">List</span><span class="s2">&lt;</span><span class="s1">GenerationPower</span><span class="s2">&gt;&gt;)</span><span class="s1">: String </span><span class="s2">{</span>
+        <span class="s0">val </span><span class="s1">chartScripts </span><span class="s2">= </span><span class="s1">data</span><span class="s2">.</span><span class="s1">map </span><span class="s2">{ (</span><span class="s1">systemId</span><span class="s2">, </span><span class="s1">powerData</span><span class="s2">) -&gt;</span>
+            <span class="s0">val </span><span class="s1">labels </span><span class="s2">= </span><span class="s1">powerData</span><span class="s2">.</span><span class="s1">map </span><span class="s2">{ </span><span class="s1">power </span><span class="s2">-&gt;</span>
+                <span class="s0">val </span><span class="s1">timestamp </span><span class="s2">= </span><span class="s1">power</span><span class="s2">.</span><span class="s1">timestamp</span>
+                <span class="s0">if </span><span class="s2">(</span><span class="s1">timestamp </span><span class="s2">!= </span><span class="s0">null </span><span class="s2">&amp;&amp; </span><span class="s1">timestamp</span><span class="s2">.</span><span class="s1">isNotEmpty</span><span class="s2">()) {</span>
+                    <span class="s0">try </span><span class="s2">{</span>
+                        <span class="s0">val </span><span class="s1">sdf </span><span class="s2">= </span><span class="s1">SimpleDateFormat</span><span class="s2">(</span><span class="s3">&quot;yyyy-MM-dd'T'HH:mm&quot;</span><span class="s2">, </span><span class="s1">Locale</span><span class="s2">.</span><span class="s1">getDefault</span><span class="s2">())</span>
+                        <span class="s0">val </span><span class="s1">date </span><span class="s2">= </span><span class="s1">sdf</span><span class="s2">.</span><span class="s1">parse</span><span class="s2">(</span><span class="s1">timestamp</span><span class="s2">)</span>
+
+                        <span class="s0">val </span><span class="s1">calendar </span><span class="s2">= </span><span class="s1">Calendar</span><span class="s2">.</span><span class="s1">getInstance</span><span class="s2">()</span>
+                        <span class="s1">calendar</span><span class="s2">.</span><span class="s1">time </span><span class="s2">= </span><span class="s1">date</span>
+                        <span class="s0">val </span><span class="s1">hour </span><span class="s2">= </span><span class="s1">calendar</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">Calendar</span><span class="s2">.</span><span class="s1">HOUR_OF_DAY</span><span class="s2">)</span>
+                        <span class="s0">val </span><span class="s1">minute </span><span class="s2">= </span><span class="s1">calendar</span><span class="s2">.</span><span class="s1">get</span><span class="s2">(</span><span class="s1">Calendar</span><span class="s2">.</span><span class="s1">MINUTE</span><span class="s2">)</span>
+                        <span class="s3">&quot;</span><span class="s0">$</span><span class="s1">hour</span><span class="s3">:</span><span class="s0">$</span><span class="s1">minute</span><span class="s3">&quot;</span>
+                    <span class="s2">} </span><span class="s1">catch </span><span class="s2">(</span><span class="s1">e: ParseException</span><span class="s2">) {</span>
+                        <span class="s1">Log</span><span class="s2">.</span><span class="s1">e</span><span class="s2">(</span><span class="s3">&quot;DashboardFragment&quot;</span><span class="s2">, </span><span class="s3">&quot;Error parsing timestamp&quot;</span><span class="s2">, </span><span class="s1">e</span><span class="s2">)</span>
+                        <span class="s3">&quot;N/A&quot;</span>
+                    <span class="s2">}</span>
+                <span class="s2">} </span><span class="s0">else </span><span class="s2">{</span>
+                    <span class="s3">&quot;N/A&quot;</span>
+                <span class="s2">}</span>
+            <span class="s2">}</span>
+            <span class="s0">val </span><span class="s1">values </span><span class="s2">= </span><span class="s1">powerData</span><span class="s2">.</span><span class="s1">map </span><span class="s2">{ </span><span class="s1">it</span><span class="s2">.</span><span class="s1">generationMW </span><span class="s2">}</span>
+            <span class="s0">val </span><span class="s1">labelsJson </span><span class="s2">= </span><span class="s1">labels</span><span class="s2">.</span><span class="s1">joinToString</span><span class="s2">(</span><span class="s1">prefix </span><span class="s2">= </span><span class="s3">&quot;[</span><span class="s0">\&quot;</span><span class="s3">&quot;</span><span class="s2">, </span><span class="s1">postfix </span><span class="s2">= </span><span class="s3">&quot;</span><span class="s0">\&quot;</span><span class="s3">]&quot;</span><span class="s2">, </span><span class="s1">separator </span><span class="s2">= </span><span class="s3">&quot;</span><span class="s0">\&quot;</span><span class="s3">,</span><span class="s0">\&quot;</span><span class="s3">&quot;</span><span class="s2">)</span>
+            <span class="s0">val </span><span class="s1">valuesJson </span><span class="s2">= </span><span class="s1">values</span><span class="s2">.</span><span class="s1">joinToString</span><span class="s2">(</span><span class="s1">prefix </span><span class="s2">= </span><span class="s3">&quot;[&quot;</span><span class="s2">, </span><span class="s1">postfix </span><span class="s2">= </span><span class="s3">&quot;]&quot;</span><span class="s2">, </span><span class="s1">separator </span><span class="s2">= </span><span class="s3">&quot;,&quot;</span><span class="s2">)</span>
+
+            <span class="s3">&quot;&quot;&quot;</span>
+        <span class="s3">&lt;script&gt;</span>
+            <span class="s3">var ctx_</span><span class="s0">$</span><span class="s1">systemId </span><span class="s3">= document.getElementById('chart_</span><span class="s0">$</span><span class="s1">systemId</span><span class="s3">').getContext('2d');</span>
+            <span class="s3">new Chart(ctx_</span><span class="s0">$</span><span class="s1">systemId</span><span class="s3">, {</span>
+                <span class="s3">type: 'line',</span>
+                <span class="s3">data: {</span>
+                    <span class="s3">labels: </span><span class="s0">$</span><span class="s1">labelsJson</span><span class="s3">,</span>
+                    <span class="s3">datasets: [{</span>
+                        <span class="s3">label: 'Power Data for System </span><span class="s0">$</span><span class="s1">systemId</span><span class="s3">',</span>
+                        <span class="s3">data: </span><span class="s0">$</span><span class="s1">valuesJson</span><span class="s3">,</span>
+                        <span class="s3">backgroundColor: 'rgba(255, 99, 132, 0.2)',</span>
+                        <span class="s3">borderColor: 'rgba(255, 99, 132, 1)',</span>
+                        <span class="s3">borderWidth: 1</span>
+                    <span class="s3">}]</span>
+                <span class="s3">},</span>
+                <span class="s3">options: {</span>
+                    <span class="s3">scales: {</span>
+                        <span class="s3">y: {</span>
+                            <span class="s3">beginAtZero: true</span>
+                        <span class="s3">}</span>
+                    <span class="s3">}</span>
+                <span class="s3">}</span>
+            <span class="s3">});</span>
+        <span class="s3">&lt;/script&gt;</span>
+        <span class="s3">&quot;&quot;&quot;</span><span class="s2">.</span><span class="s1">trimIndent</span><span class="s2">()</span>
+        <span class="s2">}.</span><span class="s1">joinToString</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s2">)</span>
+
+        <span class="s0">val </span><span class="s1">canvasElements </span><span class="s2">= </span><span class="s1">data</span><span class="s2">.</span><span class="s1">keys</span><span class="s2">.</span><span class="s1">joinToString</span><span class="s2">(</span><span class="s3">&quot;</span><span class="s0">\n</span><span class="s3">&quot;</span><span class="s2">) { </span><span class="s1">systemId </span><span class="s2">-&gt;</span>
+            <span class="s3">&quot;&lt;canvas id='chart_</span><span class="s0">$</span><span class="s1">systemId</span><span class="s3">' width='400' height='400'&gt;&lt;/canvas&gt;&quot;</span>
+        <span class="s2">}</span>
+
+        <span class="s0">return </span><span class="s3">&quot;&quot;&quot;</span>
+        <span class="s3">&lt;html&gt;</span>
+        <span class="s3">&lt;head&gt;</span>
+            <span class="s3">&lt;script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;&gt;&lt;/script&gt;</span>
+        <span class="s3">&lt;/head&gt;</span>
+        <span class="s3">&lt;body&gt;</span>
+            <span class="s0">$</span><span class="s1">canvasElements</span>
+            <span class="s0">$</span><span class="s1">chartScripts</span>
+        <span class="s3">&lt;/body&gt;</span>
+        <span class="s3">&lt;/html&gt;</span>
+    <span class="s3">&quot;&quot;&quot;</span><span class="s2">.</span><span class="s1">trimIndent</span><span class="s2">()</span>
+    <span class="s2">}</span>
+<span class="s2">}</span>
+</pre>
+</body>
+</html>
